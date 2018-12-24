@@ -1,0 +1,10 @@
+# Compiled object files
+.o
+
+# Compiled dynamic libraries
+*.dll
+
+# Executables
+*.exe
+*.out
+*.app
