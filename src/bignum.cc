@@ -20,7 +20,6 @@
   SOFTWARE.
 */
 #include <cstring>
-#include <iostream>
 #include <iomanip>
 #include <cmath>
 
@@ -101,8 +100,8 @@ void Bignum::translate_string_to_number(const char *number, int length,
       this->number.push_back(chunk);
       chunk = 0; mul = 1;
     }
-    if (translate_char_to_digit(number[i]) >= MIN_VALUE && 
-        translate_char_to_digit(number[i]) <= MAX_VALUE) {
+    if ((translate_char_to_digit(number[i]) >= MIN_VALUE) && 
+        (translate_char_to_digit(number[i]) <= MAX_VALUE)) {
       chunk += translate_char_to_digit(number[i]) * mul;
       mul *= base;
       this->size++;
@@ -137,14 +136,16 @@ void Bignum::add(const Bignum& other)
   Bignum number = other;
 
   // Calls a subtraction method for the following scenarios: 
-  // - two numbers (A and B) number A with a positive sign and number B with a negative sign: A + (-B) = A - B
+  // - two numbers (A and B) number A with a positive sign and number B with a negative
+  //   sign: A + (-B) = A - B
   if (this->sign == POSITIVE && other.sign == NEGATIVE) {
     number.sign = POSITIVE;
     return this->sub(number);
   }
 
   // Calls a subtraction method for the following scenarios: 
-  // - two numbers (A and B) number A with a negative sign and number B with a positive sign: -A + B = B - A
+  // - two numbers (A and B) number A with a negative sign and number B with a positive
+  //   sign: -A + B = B - A
   if (this->sign == NEGATIVE && other.sign == POSITIVE) {
     this->sign = POSITIVE;
     return this->sub(other, true);  // NOTE: Calls a sub method as reverse
@@ -171,6 +172,16 @@ void Bignum::add(const Bignum& other)
 
   if (carry > 0)
     this->number.push_back(carry);
+
+  uint32_t last = this->number.back();
+  this->size = last == 0 ? 1 : 0;
+
+  while (last) {
+    last /= 10;
+    this->size++;
+  }
+  if (this->number.size() > 1)
+    this->size += (this->number.size() - 1) * 9;
 }
 
 void Bignum::sub(int64_t number)
@@ -196,7 +207,8 @@ void Bignum::sub(const Bignum& other, bool reverse)
   Bignum number = other;
 
   // Calls an addition method for the following scenarios:
-  // - two numbers (A and B) number A with a positive sign and number B with a negative sign: A - (-B) = A + B
+  // - two numbers (A and B) number A with a positive sign and number B with a negative 
+  //   sign: A - (-B) = A + B
   // - two numbers (A and B) with a negative sign: -A - (-B) = -A + B
   if ((this->sign == POSITIVE && other.sign == NEGATIVE) ||
       (this->sign == NEGATIVE && other.sign == NEGATIVE)) {
@@ -205,7 +217,8 @@ void Bignum::sub(const Bignum& other, bool reverse)
   }
 
   // Calls an addition method for the following scenarios:
-  // - two numbers (A and B) number A with a negative sign and number B with a postive sign: -A - B = -(A + B)
+  // - two numbers (A and B) number A with a negative sign and number B with a positive 
+  //   sign: -A - B = -(A + B)
   if (this->sign == NEGATIVE && other.sign == POSITIVE) {
     this->sign = POSITIVE;
     this->add(other);
@@ -258,6 +271,16 @@ void Bignum::sub(const Bignum& other, bool reverse)
   while (!greater.number.back() && greater.number.size() > 1)
     greater.number.pop_back();
 
+  uint32_t last = greater.number.back();
+  greater.size = last == 0 ? 1 : 0;
+
+  while (last) {
+    last /= 10;
+    greater.size++;
+  }
+  if (greater.number.size() > 1)
+    greater.size += (greater.number.size() - 1) * 9;
+
   *this = greater;
 }
 
@@ -299,33 +322,23 @@ bool Bignum::operator>(const Bignum& other) const
   else if (this->sign == NEGATIVE && other.sign == POSITIVE)
     return false;
 
-  if ((this->size > other.size) && this->sign == POSITIVE)
+  if (((this->size > other.size) && this->sign == POSITIVE) ||
+      ((this->sign < other.sign) && this->sign == NEGATIVE))
     return true;
-  else if ((this->size < other.size) && this->sign == POSITIVE)
+  else if (((this->size < other.size) && this->sign == POSITIVE) || 
+           ((this->size > other.size) && this->sign == NEGATIVE))
     return false;
 
-  if ((this->size > other.size) && this->sign == NEGATIVE)
-    return false;
-  else if ((this->size < other.size) && this->sign == NEGATIVE)
-    return true;
-
-  if (this->sign == NEGATIVE) {
-    for (int i = 0; i < this->size; i++) {
-      if (this->operator[](i) < other[i])
-        return true;
-      else if (this->operator[](i) > other[i])
-        return false;
-    }
-    return false;
-  } else {
-    for (int i = 0; i < this->size; i++) {
-      if (this->operator[](i) < other[i])
-        return false;
-      else if (this->operator[](i) > other[i])
-        return true;
-    }
-    return false;
+  for (int i = 0; i < this->size; i++) {
+    if (((this->operator[](i) > other[i]) && this->sign == POSITIVE) ||
+        ((this->operator[](i) < other[i]) && this->sign == NEGATIVE))
+      return true;
+    else if (((this->operator[](i) < other[i]) && this->sign == POSITIVE) ||
+             ((this->operator[](i) > other[i]) && this->sign == NEGATIVE))
+      return false;
   }
+
+  return false;
 }
 
 Bignum& Bignum::operator+=(int64_t number)
