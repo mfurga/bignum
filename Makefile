@@ -1,5 +1,5 @@
-CC = g++
-COMPILER_FLAGS = -Wall -Wextra -std=c++17 -Wno-unused-variable
+CC = g++-5
+COMPILER_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-variable
 COMPILER_FLAGS_TEST = -g -lgtest -lpthread
 
 DIRS = src/bignum.cc
