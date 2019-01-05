@@ -29,6 +29,22 @@
 
 namespace bignum {
 
+Bignum::Bignum(int number)
+{
+  if (number >= 0)
+    this->sign = POSITIVE;
+  else
+    this->sign = NEGATIVE;
+
+  number = llabs(number);
+  while (number) {
+    this->number.push_back(number % 1000000000);
+    number /= 1000000000;
+  }
+
+  this->normalizate();
+}
+
 Bignum::Bignum(int64_t number)
 {
   if (number >= 0)
@@ -39,9 +55,10 @@ Bignum::Bignum(int64_t number)
   number = llabs(number);
   while (number) {
     this->number.push_back(number % 1000000000);
-    this->size++;
     number /= 1000000000;
   }
+
+  this->normalizate();
 }
 
 Bignum::Bignum(const char *number)
@@ -81,6 +98,27 @@ inline int translate_char_to_digit(const char c)
   return -1;
 }
 
+void Bignum::normalizate()
+{
+  if (this->number.size() == 0) {
+    this->number.push_back(0);
+    this->size = 1;
+    return;
+  }
+
+  uint32_t last = this->number.back();
+  int size = last == 0 ? 1 : 0;
+
+  while (last) {
+    last /= 10;
+    size++;
+  }
+  if (this->number.size() > 1)
+    size += (this->number.size() - 1) * 9;
+
+  this->size = size;
+}
+
 void Bignum::translate_string_to_number(const char *number, int length, 
                                         const Base& repr)
 {
@@ -104,12 +142,13 @@ void Bignum::translate_string_to_number(const char *number, int length,
         (translate_char_to_digit(number[i]) <= MAX_VALUE)) {
       chunk += translate_char_to_digit(number[i]) * mul;
       mul *= base;
-      this->size++;
     }
   }
 
   if (chunk > 0)
     this->number.push_back(chunk);
+
+  this->normalizate();
 }
 
 void Bignum::add(int64_t number)
@@ -173,15 +212,7 @@ void Bignum::add(const Bignum& other)
   if (carry > 0)
     this->number.push_back(carry);
 
-  uint32_t last = this->number.back();
-  this->size = last == 0 ? 1 : 0;
-
-  while (last) {
-    last /= 10;
-    this->size++;
-  }
-  if (this->number.size() > 1)
-    this->size += (this->number.size() - 1) * 9;
+  this->normalizate();
 }
 
 void Bignum::sub(int64_t number)
@@ -271,16 +302,7 @@ void Bignum::sub(const Bignum& other, bool reverse)
   while (!greater.number.back() && greater.number.size() > 1)
     greater.number.pop_back();
 
-  uint32_t last = greater.number.back();
-  greater.size = last == 0 ? 1 : 0;
-
-  while (last) {
-    last /= 10;
-    greater.size++;
-  }
-  if (greater.number.size() > 1)
-    greater.size += (greater.number.size() - 1) * 9;
-
+  greater.normalizate();
   *this = greater;
 }
 
@@ -313,32 +335,6 @@ bool Bignum::operator==(const Bignum& other) const
       return false;
 
   return true;
-}
-
-bool Bignum::operator>(const Bignum& other) const
-{
-  if (this->sign == POSITIVE && other.sign == NEGATIVE)
-    return true;
-  else if (this->sign == NEGATIVE && other.sign == POSITIVE)
-    return false;
-
-  if (((this->size > other.size) && this->sign == POSITIVE) ||
-      ((this->sign < other.sign) && this->sign == NEGATIVE))
-    return true;
-  else if (((this->size < other.size) && this->sign == POSITIVE) || 
-           ((this->size > other.size) && this->sign == NEGATIVE))
-    return false;
-
-  for (int i = 0; i < this->size; i++) {
-    if (((this->operator[](i) > other[i]) && this->sign == POSITIVE) ||
-        ((this->operator[](i) < other[i]) && this->sign == NEGATIVE))
-      return true;
-    else if (((this->operator[](i) < other[i]) && this->sign == POSITIVE) ||
-             ((this->operator[](i) > other[i]) && this->sign == NEGATIVE))
-      return false;
-  }
-
-  return false;
 }
 
 Bignum& Bignum::operator+=(int64_t number)
@@ -387,6 +383,11 @@ Bignum& Bignum::operator-=(const Bignum& number)
 {
   this->sub(number);
   return *this;
+}
+
+std::vector<uint32_t> Bignum::get_number_repr() const
+{
+  return this->number;
 }
 
 }  // namespace bignum

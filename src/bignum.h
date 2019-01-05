@@ -44,7 +44,11 @@ enum Sign {
 
 class Bignum {
  public:
+  int size = 0;
+  Sign sign = POSITIVE;
+
   Bignum() {};
+  Bignum(int number);
   Bignum(int64_t number);
   Bignum(const char *number);
   Bignum(const std::string& number);
@@ -58,7 +62,6 @@ class Bignum {
 
   int operator[](int index) const;
   bool operator==(const Bignum& other) const;
-  // bool operator>(const Bignum& other) const;
 
   // Addition
   void add(int64_t number);
@@ -85,13 +88,14 @@ class Bignum {
   // Input / Output
   friend std::ostream& operator<<(std::ostream& os, const Bignum& number);
 
- public:
-  int size = 0;
-  Sign sign = POSITIVE;
+  std::vector<uint32_t> get_number_repr() const;
+
+ private:
   std::vector<uint32_t> number;
 
   void translate_string_to_number(const char *number, int length, 
                                   const Base& repr);
+  void normalizate();
 };
 
 }  // namespace bignum
