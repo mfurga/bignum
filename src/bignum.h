@@ -34,15 +34,23 @@
 
 namespace bignum {
 
-enum Base {
-  BIN, DEC, HEX
+// Allowed representations of the number.
+enum class Base 
+{
+  BIN,  // Binary numeral system (K = 2).
+  DEC,  // Decimal numeral system (K = 10).
+  HEX   // Hexadecimal numeral system (K = 16).
 };
 
-enum Sign {
-  NEGATIVE, POSITIVE
+// Allowed signs of the number.
+enum Sign 
+{
+  NEGATIVE,
+  POSITIVE
 };
 
-class Bignum {
+class Bignum 
+{
  public:
   int size = 0;
   Sign sign = POSITIVE;
@@ -60,15 +68,14 @@ class Bignum {
   Bignum operator=(const char *number);
   Bignum operator=(const std::string& number);
 
-  int operator[](int index) const;
-  bool operator==(const Bignum& other) const;
-
   // Addition
+  void add(int number);
   void add(int64_t number);
   void add(const char *number);
   void add(const std::string& number);
   void add(const Bignum& other);
 
+  Bignum& operator+=(int number);
   Bignum& operator+=(int64_t number);
   Bignum& operator+=(const char *number);
   Bignum& operator+=(const std::string& number);
@@ -88,7 +95,12 @@ class Bignum {
   // Input / Output
   friend std::ostream& operator<<(std::ostream& os, const Bignum& number);
 
-  std::vector<uint32_t> get_number_repr() const;
+  // Operators
+  bool operator==(const Bignum& other) const;
+  bool operator!=(const Bignum& other) const;
+  int operator[](int index) const;
+
+  std::vector<uint32_t> repr() const;
 
  private:
   std::vector<uint32_t> number;

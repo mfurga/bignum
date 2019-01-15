@@ -151,6 +151,11 @@ void Bignum::translate_string_to_number(const char *number, int length,
   this->normalizate();
 }
 
+void Bignum::add(int number)
+{
+  this->add(Bignum(number));
+}
+
 void Bignum::add(int64_t number)
 {
   this->add(Bignum(number));
@@ -263,7 +268,7 @@ void Bignum::sub(const Bignum& other, bool reverse)
     greater = other; smaller = *this;
     greater.sign = NEGATIVE;
   }
-  else if (this->size == other.size){
+  else if (this->size == other.size) {
     for (int i = 0; i < this->size; i++) {
       if (this->operator[](i) > other[i]) {
         greater = *this; smaller = other;
@@ -275,9 +280,6 @@ void Bignum::sub(const Bignum& other, bool reverse)
       }
     }
   }
-
-  if (reverse)
-    greater.sign = greater.sign == POSITIVE ? NEGATIVE : POSITIVE;
 
   const size_t diff = greater.number.size() - smaller.number.size();
 
@@ -298,15 +300,16 @@ void Bignum::sub(const Bignum& other, bool reverse)
     greater.number[i] = n;
   }
 
-  // Removes a leading zeros
   while (!greater.number.back() && greater.number.size() > 1)
     greater.number.pop_back();
 
   greater.normalizate();
+
+  if (reverse && greater != 0)
+    greater.sign = greater.sign == POSITIVE ? NEGATIVE : POSITIVE;
+
   *this = greater;
 }
-
-// ==================== O P E R A T O R S ====================
 
 std::ostream& operator<<(std::ostream& os, const Bignum& self)
 {
@@ -327,14 +330,32 @@ int Bignum::operator[](int index) const
 
 bool Bignum::operator==(const Bignum& other) const
 {
-  if ((this->sign != other.sign) || (this->size != other.size))
+  if (this->sign != other.sign || this->size != other.size)
     return false;
 
-  for (int i = 0; i < this->size; i++)
-    if (this->operator[](i) != other[i])
+  for (size_t i = 0; i < this->number.size(); i++)
+    if (this->number[i] != other.number[i])
       return false;
 
   return true;
+}
+
+bool Bignum::operator!=(const Bignum& other) const
+{
+  if (this->sign != other.sign || this->size != other.size)
+    return true;
+
+  for (size_t i = 0; i < this->number.size(); i++)
+    if (this->number[i] != other.number[i])
+      return true;
+
+  return false;
+}
+
+Bignum& Bignum::operator+=(int number)
+{
+  this->add(number);
+  return *this;
 }
 
 Bignum& Bignum::operator+=(int64_t number)
@@ -385,7 +406,7 @@ Bignum& Bignum::operator-=(const Bignum& number)
   return *this;
 }
 
-std::vector<uint32_t> Bignum::get_number_repr() const
+std::vector<uint32_t> Bignum::repr() const
 {
   return this->number;
 }
