@@ -3,7 +3,7 @@ COMPILER_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-variable
 COMPILER_FLAGS_TEST = -g -lgtest -lpthread
 
 DIRS = src/bignum.cc
-DIRS_TEST = test/tests.cc
+DIRS_TEST = test/test_main.cc test/test_init.cc test/test_add.cc
 
 BUILDDIR = build
 OUTPUT_TEST = test
