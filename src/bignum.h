@@ -1,41 +1,17 @@
-/*
-  Copyright (c) 2018 Mateusz Furga <matfurga@gmail.com>
+//
+// Copyright (c) 2019 Mateusz Furga <matfurga@gmail.com>
+// This software is released under the MIT license (see LICENSE).
+// ================================================================
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-*/
 #pragma once
 
 #include <string>
 #include <vector>
 
-#define U16(n) (static_cast<uint16_t>(n))
-#define U32(n) (static_cast<uint32_t>(n))
-#define U64(n) (static_cast<uint64_t>(n))
-
-#define S16(n) (static_cast<int16_t>(n))
-#define S32(n) (static_cast<int32_t>(n))
-#define S64(n) (static_cast<int64_t>(n))
-
 namespace bignum {
 
 // Allowed representations of the number.
-enum class Base 
+enum class Base
 {
   BIN,  // Binary numeral system (K = 2).
   DEC,  // Decimal numeral system (K = 10).
@@ -64,9 +40,11 @@ class Bignum
 
   ~Bignum();
 
-  Bignum operator=(int64_t number);
-  Bignum operator=(const char *number);
-  Bignum operator=(const std::string& number);
+  // Bignum& operator=(int number);
+  // Bignum& operator=(int64_t number);
+  // Bignum& operator=(const char *number);
+  // Bignum& operator=(const std::string& number);
+  // Bignum& operator=(const Bignum& number);
 
   // Addition
   void add(int number);
@@ -82,9 +60,10 @@ class Bignum
   Bignum& operator+=(const Bignum& number);
 
   // Subtraction
-  void sub(int64_t number);
-  void sub(const char *number);
-  void sub(const std::string& number);
+  void sub(int number, bool reverse=false);
+  void sub(int64_t number, bool reverse=false);
+  void sub(const char *number, bool reverse=false);
+  void sub(const std::string& number, bool reverse=false);
   void sub(const Bignum& other, bool reverse=false);
 
   Bignum& operator-=(int64_t number);

@@ -1,24 +1,8 @@
-/*
-  Copyright (c) 2018 Mateusz Furga <matfurga@gmail.com>
+//
+// Copyright (c) 2019 Mateusz Furga <matfurga@gmail.com>
+// This software is released under the MIT license (see LICENSE).
+// ================================================================
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-*/
 #include <cstring>
 #include <iomanip>
 #include <cmath>
@@ -27,18 +11,22 @@
 
 #define UNUSED(x) (void)(x)
 
+#define U16(n) (static_cast<uint16_t>(n))
+#define U32(n) (static_cast<uint32_t>(n))
+#define U64(n) (static_cast<uint64_t>(n))
+
+#define S16(n) (static_cast<int16_t>(n))
+#define S32(n) (static_cast<int32_t>(n))
+#define S64(n) (static_cast<int64_t>(n))
+
 namespace bignum {
 
 Bignum::Bignum(int number)
 {
-  if (number >= 0)
-    this->sign = POSITIVE;
-  else
-    this->sign = NEGATIVE;
+  this->sign = number >= 0 ? POSITIVE : NEGATIVE;
 
-  number = llabs(number);
   while (number) {
-    this->number.push_back(number % 1000000000);
+    this->number.push_back(abs(number % 1000000000));
     number /= 1000000000;
   }
 
@@ -47,14 +35,10 @@ Bignum::Bignum(int number)
 
 Bignum::Bignum(int64_t number)
 {
-  if (number >= 0)
-    this->sign = POSITIVE;
-  else
-    this->sign = NEGATIVE;
+  this->sign = number >= 0 ? POSITIVE : NEGATIVE;
 
-  number = llabs(number);
   while (number) {
-    this->number.push_back(number % 1000000000);
+    this->number.push_back(abs(number % 1000000000));
     number /= 1000000000;
   }
 
@@ -87,7 +71,7 @@ Bignum::Bignum(const std::string& number)
 
 Bignum::~Bignum() {}
 
-inline int translate_char_to_digit(const char c)
+static inline int translate_char_to_digit(const char c)
 {
   if (c >= '0' && c <= '9')
     return c - '0';
@@ -100,23 +84,21 @@ inline int translate_char_to_digit(const char c)
 
 void Bignum::normalizate()
 {
-  if (this->number.size() == 0) {
-    this->number.push_back(0);
+  if (!this->number.size()) {
     this->size = 1;
+    this->number.push_back(0);
     return;
   }
 
   uint32_t last = this->number.back();
-  int size = last == 0 ? 1 : 0;
+  this->size = last == 0 ? 1 : 0;
 
   while (last) {
     last /= 10;
-    size++;
+    this->size++;
   }
   if (this->number.size() > 1)
-    size += (this->number.size() - 1) * 9;
-
-  this->size = size;
+    this->size += (this->number.size() - 1) * 9;
 }
 
 void Bignum::translate_string_to_number(const char *number, int length, 
@@ -129,17 +111,17 @@ void Bignum::translate_string_to_number(const char *number, int length,
   UNUSED(repr);
 
   int base = 10, mul = 1;
-  int MIN_VALUE = 0, MAX_VALUE = 9;
+  int MIN_VALUE = 0, MAX_VALUE = 9, MAX_MUL = 1000000000;
 
   uint32_t chunk = 0;
 
   for (int i = length - 1; i >= 0; i--) {
-    if (mul == 1000000000) {
+    if (mul == MAX_MUL) {
       this->number.push_back(chunk);
       chunk = 0; mul = 1;
     }
-    if ((translate_char_to_digit(number[i]) >= MIN_VALUE) && 
-        (translate_char_to_digit(number[i]) <= MAX_VALUE)) {
+    if (translate_char_to_digit(number[i]) >= MIN_VALUE && 
+        translate_char_to_digit(number[i]) <= MAX_VALUE) {
       chunk += translate_char_to_digit(number[i]) * mul;
       mul *= base;
     }
@@ -220,19 +202,24 @@ void Bignum::add(const Bignum& other)
   this->normalizate();
 }
 
-void Bignum::sub(int64_t number)
+void Bignum::sub(int number, bool reverse)
 {
-  this->sub(Bignum(number));
+  this->sub(Bignum(number), reverse);
 }
 
-void Bignum::sub(const char *number)
+void Bignum::sub(int64_t number, bool reverse)
 {
-  this->sub(Bignum(number));
+  this->sub(Bignum(number), reverse);
 }
 
-void Bignum::sub(const std::string& number)
+void Bignum::sub(const char *number, bool reverse)
 {
-  this->sub(Bignum(number));
+  this->sub(Bignum(number), reverse);
+}
+
+void Bignum::sub(const std::string& number, bool reverse)
+{
+  this->sub(Bignum(number), reverse);
 }
 
 void Bignum::sub(const Bignum& other, bool reverse)
@@ -282,7 +269,6 @@ void Bignum::sub(const Bignum& other, bool reverse)
   }
 
   const size_t diff = greater.number.size() - smaller.number.size();
-
   for (size_t i = 0; i < diff; i++)
     smaller.number.push_back(0);
 
