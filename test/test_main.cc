@@ -1,5 +1,9 @@
+//
+// Copyright (c) 2019 Mateusz Furga <matfurga@gmail.com>
+// This software is released under the MIT license (see LICENSE).
+// ================================================================
+
 #include <gtest/gtest.h>
-#include <iostream>
 
 int main(int argc, char **argv)
 {

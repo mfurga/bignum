@@ -1,9 +1,9 @@
 //
-// Copyright (c) 2018 Mateusz Furga <matfurga@gmail.com>
+// Copyright (c) 2019 Mateusz Furga <matfurga@gmail.com>
 // This software is released under the MIT license (see LICENSE).
 // 
 // Unit tests for addition.
-//
+// ================================================================
 
 #include <gtest/gtest.h>
 #include "../src/bignum.h"
@@ -133,8 +133,8 @@ TEST(BignumAdd, AddNumbersWithNegativeSignBig)
     920812071, 898365834, 780249731, 967832389, 835588506,
       9930875, 418480868, 271254385, 358265531, 649835032,
     185165790, 204141796, 112241990, 805549333, 845398840, 10));
-  EXPECT_EQ(number_negative_big.size, 5 * 45 + 2);
   EXPECT_EQ(number_negative_big.sign, NEGATIVE);
+  EXPECT_EQ(number_negative_big.size, 5 * 45 + 2);
 }
 
 TEST(BignumAdd, AddNumbersWithDifferentSign)
@@ -144,41 +144,81 @@ TEST(BignumAdd, AddNumbersWithDifferentSign)
 
   EXPECT_TRUE(number == "-54719180334491487081");
   EXPECT_EQ(number.repr(), VU32(491487081, 719180334, 54));
-  EXPECT_EQ(number.size, 20);
   EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 20);
 
   number.add("54719180334491487081");
 
   EXPECT_TRUE(number == 0);
   EXPECT_EQ(number.repr(), VU32(0));
-  EXPECT_EQ(number.size, 1);
   EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
 
   number.add(-1);
 
   EXPECT_TRUE(number == -1);
   EXPECT_EQ(number.repr(), VU32(1));
-  EXPECT_EQ(number.size, 1);
   EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
 
   number.add(1);
 
   EXPECT_TRUE(number == 0);
   EXPECT_EQ(number.repr(), VU32(0));
-  EXPECT_EQ(number.size, 1);
   EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
 
   number.add("-68721701084578848266");
 
   EXPECT_TRUE(number == "-68721701084578848266");
   EXPECT_EQ(number.repr(), VU32(578848266, 721701084, 68));
-  EXPECT_EQ(number.size, 20);
   EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 20);
 
   number.add("68721701084578848265");
 
   EXPECT_TRUE(number == -1);
   EXPECT_EQ(number.repr(), VU32(1));
-  EXPECT_EQ(number.size, 1);
   EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumAdd, AddNumbersWithDifferentSignBig)
+{
+  Bignum number_big = "437077265578085174001862394625344405874109873"
+                      "885794217599617983969274534222814952905178872"
+                      "142094578705794275912276650352513973172093622"
+                      "610221728942613882729237213738818500265101166"
+                      "253302491784027344410319457405642082964772489";
+
+  number_big.add("-834485322151135799896773293451687495409228824"
+                  "371752748715498733111612285355090995500540255"
+                  "075985177206485632132683388091645824314885086"
+                  "795341310174491657801418818908278590545618672"
+                  "276259763129865674099626535575285098535630549");
+  
+  EXPECT_TRUE(number_big == "-397408056573050625894910898826343089535118950"
+                             "485958531115880749142337751132276042595361382"
+                             "933890598500691356220406737739131851142791464"
+                             "185119581231877775072181605169460090280517506"
+                             "022957271345838329689307078169643015570858060");
+  EXPECT_EQ(number_big.repr(), VU32(
+    570858060, 169643015, 689307078, 345838329,  22957271,
+    280517506, 169460090,  72181605, 231877775, 185119581,
+    142791464, 739131851, 220406737, 500691356, 933890598,
+    595361382, 132276042, 142337751, 115880749, 485958531,
+    535118950, 826343089, 894910898, 573050625, 397408056
+  ));
+  EXPECT_EQ(number_big.sign, NEGATIVE);
+  EXPECT_EQ(number_big.size, 45 * 5);
+
+  number_big.add("397408056573050625894910898826343089535118950"
+                 "485958531115880749142337751132276042595361382"
+                 "933890598500691356220406737739131851142791464"
+                 "185119581231877775072181605169460090280517506"
+                 "022957271345838329689307078169643015570858060");
+  EXPECT_TRUE(number_big == 0);
+  EXPECT_EQ(number_big.repr(), VU32(0));
+  EXPECT_EQ(number_big.sign, POSITIVE);
+  EXPECT_EQ(number_big.size, 1);
 }
