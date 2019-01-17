@@ -299,6 +299,9 @@ void Bignum::sub(const Bignum& other, bool reverse)
 
 std::ostream& operator<<(std::ostream& os, const Bignum& self)
 {
+  if (self.sign == NEGATIVE)
+    os << "-";
+
   for (int i = self.number.size() - 1; i >= 0; i--) {
     if (i != int(self.number.size()) - 1)
       os << std::setfill('0') << std::setw(9) << self.number[i];
@@ -365,6 +368,12 @@ Bignum& Bignum::operator+=(const std::string& number)
 Bignum& Bignum::operator+=(const Bignum& number)
 {
   this->add(number);
+  return *this;
+}
+
+Bignum& Bignum::operator-=(int number)
+{
+  this->sub(number);
   return *this;
 }
 

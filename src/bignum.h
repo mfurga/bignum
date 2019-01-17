@@ -66,6 +66,7 @@ class Bignum
   void sub(const std::string& number, bool reverse=false);
   void sub(const Bignum& other, bool reverse=false);
 
+  Bignum& operator-=(int number);
   Bignum& operator-=(int64_t number);
   Bignum& operator-=(const char *number);
   Bignum& operator-=(const std::string& number);
