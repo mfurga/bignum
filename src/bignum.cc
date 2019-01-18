@@ -297,6 +297,34 @@ void Bignum::sub(const Bignum& other, bool reverse)
   *this = greater;
 }
 
+Bignum& Bignum::operator=(int number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
+Bignum& Bignum::operator=(int64_t number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
+Bignum& Bignum::operator=(const char *number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
+Bignum& Bignum::operator=(const std::string& number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
 std::ostream& operator<<(std::ostream& os, const Bignum& self)
 {
   if (self.sign == NEGATIVE)

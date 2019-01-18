@@ -40,11 +40,10 @@ class Bignum
 
   ~Bignum();
 
-  // Bignum& operator=(int number);
-  // Bignum& operator=(int64_t number);
-  // Bignum& operator=(const char *number);
-  // Bignum& operator=(const std::string& number);
-  // Bignum& operator=(const Bignum& number);
+  Bignum& operator=(int number);
+  Bignum& operator=(int64_t number);
+  Bignum& operator=(const char *number);
+  Bignum& operator=(const std::string& number);
 
   // Addition
   void add(int number);
