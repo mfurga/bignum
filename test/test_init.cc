@@ -175,7 +175,7 @@ TEST(BignumInit, InitStartsNotEmptyNumberAsStdString)
   EXPECT_EQ(number_negative_one.size, 1);
 }
 
-TEST(BignumInit, InitStartsEmptyNumberMaxInt)
+TEST(BignumInit, InitStartsNotEmptyNumberMaxInt)
 {
   Bignum number_positive_max = 0x7fffffffffffffff;
 
@@ -197,4 +197,164 @@ TEST(BignumInit, InitStartsEmptyNumberMaxInt)
   EXPECT_EQ(number_negative_max.repr(), VU32(854775808, 223372036, 9));
   EXPECT_EQ(number_negative_max.sign, NEGATIVE);
   EXPECT_EQ(number_negative_max.size, 19);
+}
+
+TEST(BignumInit, InitStartsEmptyNumberAsZeroOperator)
+{
+  Bignum number;
+
+  number = 0;
+  number = "0";
+  number = std::string("0");
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumInit, InitStartsEmptyNumberAsIntOperator)
+{
+  Bignum number;
+
+  number = 8238173113;
+  
+  EXPECT_TRUE(number == 8238173113);
+  EXPECT_EQ(number.repr(), VU32(238173113, 8));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 10);
+
+  number = -98517319283911;
+
+  EXPECT_TRUE(number == -98517319283911);
+  EXPECT_EQ(number.repr(), VU32(319283911, 98517));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 14);
+
+  number = 0;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = -1;
+
+  EXPECT_TRUE(number == -1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = 1;
+
+  EXPECT_TRUE(number == 1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumInit, InitStartsEmptyNumberAsCStringOperator)
+{
+  Bignum number;
+
+  number = "623603656252274157077063665497";
+
+  EXPECT_TRUE(number == "623603656252274157077063665497");
+  EXPECT_EQ(number.repr(), VU32(63665497, 274157077, 603656252, 623));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 30);
+
+  number = "-3044153646933764172710710945625145";
+
+  EXPECT_TRUE(number == "-3044153646933764172710710945625145");
+  EXPECT_EQ(number.repr(), VU32(945625145, 172710710, 646933764, 3044153));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 34);
+
+  number = "0";
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = "-1";
+
+  EXPECT_TRUE(number == -1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = "1";
+
+  EXPECT_TRUE(number == 1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumInit, InitStartsEmptyNumberAsStdStringOperator)
+{
+  Bignum number;
+
+  number = std::string("5074227671555300853158431736651981");
+
+  EXPECT_TRUE(number == "5074227671555300853158431736651981");
+  EXPECT_EQ(number.repr(), VU32(736651981, 853158431, 671555300, 5074227));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 34);
+
+  number = std::string("-90091321523344500000000000000000000");
+
+  EXPECT_TRUE("-90091321523344500000000000000000000");
+  EXPECT_EQ(number.repr(), VU32(0, 0, 523344500, 90091321));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 35);
+
+  number = std::string("0");
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = std::string("-1");
+
+  EXPECT_TRUE(number == -1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = std::string("1");
+
+  EXPECT_TRUE(number == 1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumInit, InitStartsEmptyNumberAsMaxIntOperator)
+{
+  Bignum number;
+
+  number = 0x7fffffffffffffff;
+
+  EXPECT_TRUE(number == "9223372036854775807");
+  EXPECT_EQ(number.repr(), VU32(854775807, 223372036, 9));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 19);
+
+  number = -0x7fffffffffffffff;
+
+  EXPECT_TRUE(number == "-9223372036854775807");
+  EXPECT_EQ(number.repr(), VU32(854775807, 223372036, 9));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 19);
+
+  number = static_cast<int64_t>(-0x8000000000000000);
+
+  EXPECT_TRUE(number == "-9223372036854775808");
+  EXPECT_EQ(number.repr(), VU32(854775808, 223372036, 9));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 19);
 }
