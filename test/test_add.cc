@@ -222,3 +222,103 @@ TEST(BignumAdd, AddNumbersWithDifferentSignBig)
   EXPECT_EQ(number_big.sign, POSITIVE);
   EXPECT_EQ(number_big.size, 1);
 }
+
+TEST(BignumAdd, AddTwoZerosOperator)
+{
+  Bignum number = 0;
+
+  number += 0;
+  number += "0";
+  number += std::string("0");
+  number += number;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumAdd, AddNumbersWithPostivieSignOperator)
+{
+  Bignum number_positive = "9744892027605525392106078926436593913846";
+  number_positive += "8627525041266639822166859196189930534297";
+
+  EXPECT_TRUE(number_positive == "18372417068872165214272938122626524448143");
+  EXPECT_EQ(number_positive.repr(), VU32(
+    524448143, 938122626, 165214272, 417068872, 18372));
+  EXPECT_EQ(number_positive.sign, POSITIVE);
+  EXPECT_EQ(number_positive.size, 41);
+
+  number_positive += 0;
+
+  EXPECT_TRUE(number_positive == "18372417068872165214272938122626524448143");
+  EXPECT_EQ(number_positive.repr(), VU32(
+    524448143, 938122626, 165214272, 417068872, 18372));
+  EXPECT_EQ(number_positive.sign, POSITIVE);
+  EXPECT_EQ(number_positive.size, 41);
+
+  number_positive += std::string("10000000000099999999");
+
+  EXPECT_TRUE(number_positive == "18372417068872165214282938122626624448142");
+  EXPECT_EQ(number_positive.repr(), VU32(
+    624448142, 938122626, 165214282, 417068872, 18372));
+  EXPECT_EQ(number_positive.sign, POSITIVE);
+  EXPECT_EQ(number_positive.size, 41);
+}
+
+TEST(BignumAdd, AddNumbersWithNegativeSignOperator)
+{
+  Bignum number;
+  number = -1;
+
+  number += -1;
+
+  EXPECT_TRUE(number == "-2");
+  EXPECT_EQ(number.repr(), VU32(2));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number += "-6584206686066855598285259874175574224035";
+
+  EXPECT_TRUE(number == "-6584206686066855598285259874175574224037");
+  EXPECT_EQ(number.repr(), VU32(
+    574224037, 259874175, 855598285, 206686066, 6584));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 40); 
+
+  Bignum number_negative = "-77333970574883073173820193";
+  number += number_negative;
+
+  EXPECT_TRUE(number == "-6584206686066932932255834757248748044230");
+  EXPECT_EQ(number.repr(), VU32(
+    748044230, 834757248, 932932255, 206686066, 6584));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 40);
+}
+
+TEST(BignumAdd, AddNumbersWithDifferentSignOperator)
+{
+  Bignum number = 9605751714;
+  number += -9605751714;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number += "-443866550854727184307283043324628102";
+
+  EXPECT_TRUE(number == "-443866550854727184307283043324628102");
+  EXPECT_EQ(number.repr(), VU32(
+    324628102, 307283043, 854727184, 443866550));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 36);
+
+  Bignum number_positive = "443866550854727184307283043324628102";
+  number += number_positive;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}

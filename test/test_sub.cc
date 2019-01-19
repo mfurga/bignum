@@ -146,3 +146,73 @@ TEST(BignumSub, SubtractNumbersWithDifferentSign)
   EXPECT_EQ(number.sign, NEGATIVE);
   EXPECT_EQ(number.size, 21);
 }
+
+TEST(BignumSub, SubtractTwoZerosOperator)
+{
+  Bignum number = 0;
+
+  number -= "0";
+  number -= std::string("0");
+  number -= 0;
+  number -= Bignum(0);
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumSub, SubtractNumbersWithPositiveSignOperator)
+{
+  Bignum number = 98123141;
+  number -= 98123141;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number -= "276207306607787999875528331";
+
+  EXPECT_TRUE(number == "-276207306607787999875528331");
+  EXPECT_EQ(number.repr(), VU32(875528331, 607787999, 276207306));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 27);
+}
+
+TEST(BignumSub, SubtractNumbersWithNegativeSignOperator)
+{
+  Bignum number = -10000000000000000;
+  number -= -999999999999999;
+
+  EXPECT_TRUE(number == "-9000000000000001");
+  EXPECT_EQ(number.repr(), VU32(1, 9000000));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 16);
+
+  number -= "670605669143345208873360365879859";
+
+  EXPECT_TRUE(number == "-670605669143345217873360365879860");
+  EXPECT_EQ(number.repr(), VU32(365879860, 217873360, 669143345, 670605));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 33);
+}
+
+TEST(BignumSub, SubtractNumbersWithDifferentSignOperator)
+{
+  Bignum number = "4578212646929253762498755526";
+
+  number -= "-53132247305338359881";
+
+  EXPECT_TRUE(number == "4578212700061501067837115407");
+  EXPECT_EQ(number.repr(), VU32(837115407,  61501067, 578212700, 4));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 28);
+
+  number -= -1;
+
+  EXPECT_TRUE(number == "4578212700061501067837115408");
+  EXPECT_EQ(number.repr(), VU32(837115408,  61501067, 578212700, 4));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 28);
+}
