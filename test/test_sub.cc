@@ -216,3 +216,37 @@ TEST(BignumSub, SubtractNumbersWithDifferentSignOperator)
   EXPECT_EQ(number.sign, POSITIVE);
   EXPECT_EQ(number.size, 28);
 }
+
+TEST(BignumSub, SubtractNumbersDecrementOperator)
+{
+  Bignum number = 1;
+  number--;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number--;
+
+  EXPECT_TRUE(number == -1);
+  EXPECT_EQ(number.repr(), VU32(1));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = "9103912093980000000000";
+  number--;
+
+  EXPECT_TRUE(number == "9103912093979999999999");
+  EXPECT_EQ(number.repr(), VU32(999999999, 912093979, 9103));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 22);
+
+  number = "-4128875901237765789127639";
+  number--;
+
+  EXPECT_TRUE(number == "-4128875901237765789127640");
+  EXPECT_EQ(number.repr(), VU32(789127640, 901237765, 4128875));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 25);
+}

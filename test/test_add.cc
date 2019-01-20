@@ -322,3 +322,40 @@ TEST(BignumAdd, AddNumbersWithDifferentSignOperator)
   EXPECT_EQ(number.sign, POSITIVE);
   EXPECT_EQ(number.size, 1);
 }
+
+TEST(BignumAdd, AddNumbersIncrementOperator)
+{
+  Bignum number = -1;
+
+  number++;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  for (int i = 0; i < 100; i++)
+    number++;
+
+  EXPECT_TRUE(number == 100);
+  EXPECT_EQ(number.repr(), VU32(100));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 3);
+
+  number = "-129839491283495791283123";
+
+  number++;
+
+  EXPECT_TRUE(number == "-129839491283495791283122");
+  EXPECT_EQ(number.repr(), VU32(791283122, 491283495, 129839));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 24);
+
+  for (int i = 0; i < 1000; i++)
+    number++;
+
+  EXPECT_TRUE(number == "-129839491283495791282122");
+  EXPECT_EQ(number.repr(), VU32(791282122, 491283495, 129839));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 24);
+}
