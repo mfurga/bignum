@@ -73,6 +73,7 @@ class Bignum
 
   // Input / Output
   friend std::ostream& operator<<(std::ostream& os, const Bignum& number);
+  friend std::istream& operator>>(std::istream& is, Bignum& number);
 
   // Operators
   bool operator==(const Bignum& other) const;

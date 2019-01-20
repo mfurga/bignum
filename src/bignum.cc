@@ -297,34 +297,6 @@ void Bignum::sub(const Bignum& other, bool reverse)
   *this = greater;
 }
 
-Bignum& Bignum::operator=(int number)
-{
-  Bignum other(number);
-  *this = other;
-  return *this;
-}
-
-Bignum& Bignum::operator=(int64_t number)
-{
-  Bignum other(number);
-  *this = other;
-  return *this;
-}
-
-Bignum& Bignum::operator=(const char *number)
-{
-  Bignum other(number);
-  *this = other;
-  return *this;
-}
-
-Bignum& Bignum::operator=(const std::string& number)
-{
-  Bignum other(number);
-  *this = other;
-  return *this;
-}
-
 std::ostream& operator<<(std::ostream& os, const Bignum& self)
 {
   if (self.sign == NEGATIVE)
@@ -337,6 +309,14 @@ std::ostream& operator<<(std::ostream& os, const Bignum& self)
       os << self.number[i];
   }
   return os;
+}
+
+std::istream& operator>>(std::istream& is, Bignum& number)
+{
+  std::string other;
+  is >> other;
+  number = other;
+  return is;
 }
 
 int Bignum::operator[](int index) const
@@ -367,6 +347,34 @@ bool Bignum::operator!=(const Bignum& other) const
       return true;
 
   return false;
+}
+
+Bignum& Bignum::operator=(int number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
+Bignum& Bignum::operator=(int64_t number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
+Bignum& Bignum::operator=(const char *number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
+}
+
+Bignum& Bignum::operator=(const std::string& number)
+{
+  Bignum other(number);
+  *this = other;
+  return *this;
 }
 
 Bignum& Bignum::operator+=(int number)
