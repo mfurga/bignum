@@ -52,6 +52,12 @@ class Bignum
   void add(const std::string& number);
   void add(const Bignum& other);
 
+  Bignum operator+(const int number) const;
+  Bignum operator+(const int64_t number) const;
+  Bignum operator+(const char *number) const;
+  Bignum operator+(const std::string& number) const;
+  Bignum operator+(const Bignum& number) const;
+
   Bignum& operator+=(int number);
   Bignum& operator+=(int64_t number);
   Bignum& operator+=(const char *number);
@@ -64,6 +70,12 @@ class Bignum
   void sub(const char *number, bool reverse=false);
   void sub(const std::string& number, bool reverse=false);
   void sub(const Bignum& other, bool reverse=false);
+
+  Bignum operator-(const int number) const;
+  Bignum operator-(const int64_t number) const;
+  Bignum operator-(const char *number) const;
+  Bignum operator-(const std::string& number) const;
+  Bignum operator-(const Bignum& number) const;
 
   Bignum& operator-=(int number);
   Bignum& operator-=(int64_t number);
@@ -79,6 +91,8 @@ class Bignum
   bool operator==(const Bignum& other) const;
   bool operator!=(const Bignum& other) const;
   int operator[](int index) const;
+  Bignum& operator++(int);
+  Bignum& operator--(int);
 
   std::vector<uint32_t> repr() const;
 
