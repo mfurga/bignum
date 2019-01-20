@@ -90,6 +90,11 @@ class Bignum
   // Operators
   bool operator==(const Bignum& other) const;
   bool operator!=(const Bignum& other) const;
+  bool operator>=(const Bignum& other) const;
+  bool operator>(const Bignum& other) const;
+  bool operator<=(const Bignum& other) const;
+  bool operator<(const Bignum& other) const;
+
   int operator[](int index) const;
   Bignum& operator++(int);
   Bignum& operator--(int);

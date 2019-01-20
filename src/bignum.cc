@@ -349,6 +349,66 @@ bool Bignum::operator!=(const Bignum& other) const
   return false;
 }
 
+bool Bignum::operator>(const Bignum& other) const
+{
+  if (this->sign == POSITIVE && other.sign == NEGATIVE)
+    return true;
+  else if (this->sign == NEGATIVE && other.sign == POSITIVE)
+    return false;
+  
+  if ((this->size > other.size && this->sign == POSITIVE) ||
+      (this->size < other.size && this->sign == NEGATIVE))
+    return true;
+  else if ((this->size > other.size && this->sign == NEGATIVE) || 
+           (this->size < other.size && this->sign == POSITIVE))
+    return false;
+
+  for (int i = 0; i < this->size; i++) {
+    if ((this->operator[](i) > other.operator[](i) && this->sign == POSITIVE) ||
+        (this->operator[](i) < other.operator[](i) && this->sign == NEGATIVE))
+      return true;
+    else if ((this->operator[](i) > other.operator[](i) && this->sign == NEGATIVE) ||
+             (this->operator[](i) < other.operator[](i) && this->sign == POSITIVE))
+      return false;
+  }
+  return false;
+}
+
+bool Bignum::operator>=(const Bignum& other) const
+{
+  return (*this > other || *this == other);
+}
+
+bool Bignum::operator<(const Bignum& other) const
+{
+  if (this->sign == NEGATIVE && other.sign == POSITIVE)
+    return true;
+  else if (this->sign == POSITIVE && other.sign == NEGATIVE)
+    return false;
+
+  if ((this->size < other.size && this->sign == POSITIVE) ||
+      (this->size > other.size && this->sign == NEGATIVE))
+    return true;
+  else if ((this->size < other.size && this->sign == NEGATIVE) || 
+           (this->size > other.size && this->sign == POSITIVE))
+    return false;
+
+  for (int i = 0; i < this->size; i++) {
+    if ((this->operator[](i) < other.operator[](i) && this->sign == POSITIVE) ||
+        (this->operator[](i) > other.operator[](i) && this->sign == NEGATIVE))
+      return true;
+    else if ((this->operator[](i) < other.operator[](i) && this->sign == NEGATIVE) ||
+             (this->operator[](i) > other.operator[](i) && this->sign == POSITIVE))
+      return false;
+  }
+  return false;
+}
+
+bool Bignum::operator<=(const Bignum& other) const
+{
+  return (*this < other || *this == other);
+}
+
 Bignum& Bignum::operator=(int number)
 {
   Bignum other(number);
