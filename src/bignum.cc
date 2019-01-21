@@ -251,21 +251,9 @@ void Bignum::sub(const Bignum& other, bool reverse)
 
   Bignum greater = *this, smaller = other;
 
-  if (this->size < other.size) {
+  if (greater < smaller) {
     greater = other; smaller = *this;
     greater.sign = NEGATIVE;
-  }
-  else if (this->size == other.size) {
-    for (int i = 0; i < this->size; i++) {
-      if (this->operator[](i) > other[i]) {
-        greater = *this; smaller = other;
-        greater.sign = POSITIVE; break;
-      }
-      else if (this->operator[](i) < other[i]) {
-        greater = other; smaller = *this;
-        greater.sign = NEGATIVE; break;
-      }
-    }
   }
 
   const size_t diff = greater.number.size() - smaller.number.size();
