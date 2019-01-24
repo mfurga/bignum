@@ -83,6 +83,8 @@ class Bignum
   Bignum& operator-=(const std::string& number);
   Bignum& operator-=(const Bignum& number);
 
+  void mul(const Bignum& other);
+
   // Input / Output
   friend std::ostream& operator<<(std::ostream& os, const Bignum& number);
   friend std::istream& operator>>(std::istream& is, Bignum& number);

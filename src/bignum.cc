@@ -285,6 +285,35 @@ void Bignum::sub(const Bignum& other, bool reverse)
   *this = greater;
 }
 
+void Bignum::mul(const Bignum& other)
+{
+  this->sign = 1 == !(this->sign ^ other.sign) ? POSITIVE : NEGATIVE;
+  std::vector<uint32_t> number;
+
+  for (size_t i = 0; i < other.number.size(); i++) {
+    uint64_t carry = 0;
+
+    for (size_t j = 0; j < this->number.size(); j++) {
+      uint64_t n = U64(this->number[j]) * U64(other.number[i]) + carry;
+      carry = 0;
+
+      if (j + i < number.size()) {
+        carry = number[j + i] + n % 1000000000;
+        number[j + i] = carry % 1000000000;
+        carry /= 1000000000;
+      } else   
+        number.push_back(n % 1000000000);
+      carry += n / 1000000000;
+    }
+
+    if (carry > 0)
+      number.push_back(carry);
+  }
+
+  this->number = number;
+  this->normalizate();
+}
+
 std::ostream& operator<<(std::ostream& os, const Bignum& self)
 {
   if (self.sign == NEGATIVE)
