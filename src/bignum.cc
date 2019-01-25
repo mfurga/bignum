@@ -287,7 +287,11 @@ void Bignum::sub(const Bignum& other, bool reverse)
 
 void Bignum::mul(const Bignum& other)
 {
-  this->sign = 1 == !(this->sign ^ other.sign) ? POSITIVE : NEGATIVE;
+  if (*this != 0 && other != 0)
+    this->sign = 1 == !(this->sign ^ other.sign) ? POSITIVE : NEGATIVE;
+  else
+    this->sign = POSITIVE;
+
   std::vector<uint32_t> number;
 
   for (size_t i = 0; i < other.number.size(); i++) {
@@ -309,6 +313,9 @@ void Bignum::mul(const Bignum& other)
     if (carry > 0)
       number.push_back(carry);
   }
+
+  while (!number.back() && number.size() > 1)
+    number.pop_back();
 
   this->number = number;
   this->normalizate();
