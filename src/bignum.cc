@@ -387,12 +387,12 @@ bool Bignum::operator>(const Bignum& other) const
            (this->size < other.size && this->sign == POSITIVE))
     return false;
 
-  for (int i = 0; i < this->size; i++) {
-    if ((this->operator[](i) > other.operator[](i) && this->sign == POSITIVE) ||
-        (this->operator[](i) < other.operator[](i) && this->sign == NEGATIVE))
+  for (int i = this->number.size() - 1; i >= 0; i--) {
+    if ((this->number[i] > other.number[i] && this->sign == POSITIVE) ||
+        (this->number[i] < other.number[i] && this->sign == NEGATIVE))
       return true;
-    else if ((this->operator[](i) > other.operator[](i) && this->sign == NEGATIVE) ||
-             (this->operator[](i) < other.operator[](i) && this->sign == POSITIVE))
+    else if ((this->number[i] > other.number[i] && this->sign == NEGATIVE) ||
+             (this->number[i] < other.number[i] && this->sign == POSITIVE))
       return false;
   }
   return false;
@@ -417,12 +417,12 @@ bool Bignum::operator<(const Bignum& other) const
            (this->size > other.size && this->sign == POSITIVE))
     return false;
 
-  for (int i = 0; i < this->size; i++) {
-    if ((this->operator[](i) < other.operator[](i) && this->sign == POSITIVE) ||
-        (this->operator[](i) > other.operator[](i) && this->sign == NEGATIVE))
+  for (int i = this->number.size() - 1; i >= 0; i--) {
+    if ((this->number[i] < other.number[i] && this->sign == POSITIVE) ||
+        (this->number[i] > other.number[i] && this->sign == NEGATIVE))
       return true;
-    else if ((this->operator[](i) < other.operator[](i) && this->sign == NEGATIVE) ||
-             (this->operator[](i) > other.operator[](i) && this->sign == POSITIVE))
+    else if ((this->number[i] < other.number[i] && this->sign == NEGATIVE) ||
+             (this->number[i] > other.number[i] && this->sign == POSITIVE))
       return false;
   }
   return false;
