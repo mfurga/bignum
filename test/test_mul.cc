@@ -235,3 +235,140 @@ TEST(BignumMul, MultiplyNumbersWithDifferentSign)
   EXPECT_EQ(number.sign, NEGATIVE);
   EXPECT_EQ(number.size, 56);
 }
+
+TEST(BignumMul, MultiplyTwoZerosOperator)
+{
+  Bignum number = 0;
+  number *= 0;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumMul, MultiplyNumberWithZeroOperator)
+{
+  Bignum number = 459292727602571;
+  number *= 0;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number *= "550122939309917072562206531";
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  number = -1;
+  number *= 0;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+}
+
+TEST(BignumMul, MultiplyNumbersWithPositiveSignOperator)
+{
+  Bignum number = "55784645421813027272715";
+  number *= "62549630806559172100768";
+
+  EXPECT_TRUE(number == "3489308975809216212440645511209683724196945120");
+  EXPECT_EQ(number.repr(), VU32(
+    196945120, 209683724, 440645511, 809216212, 489308975, 3));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 46);
+
+  number *= 1;
+
+  EXPECT_TRUE(number == "3489308975809216212440645511209683724196945120");
+  EXPECT_EQ(number.repr(), VU32(
+    196945120, 209683724, 440645511, 809216212, 489308975, 3));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 46);
+
+  number *= 0;
+
+  EXPECT_TRUE(number == 0);
+  EXPECT_EQ(number.repr(), VU32(0));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 1);
+
+  Bignum number2 = "707925712823816168800000000000";
+  number2 *= number;
+
+  EXPECT_TRUE(number2 == 0);
+  EXPECT_EQ(number2.repr(), VU32(0));
+  EXPECT_EQ(number2.sign, POSITIVE);
+  EXPECT_EQ(number2.size, 1);
+}
+
+TEST(BignumMul, MultiplyNumbersWithNegativeSignOperator)
+{
+  Bignum number = "-88251368788097031084082310012";
+  number *= std::string("-99641272027186649556000000000");
+
+  EXPECT_TRUE(number == "8793478644186345672720810730500999796155194154672000000000");
+  EXPECT_EQ(number.repr(), VU32(
+            0, 194154672, 999796155, 810730500, 345672720,
+    478644186,      8793,));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 58);
+
+  number = -1;
+  number *= std::string("-100000");
+
+  EXPECT_TRUE(number == "100000");
+  EXPECT_EQ(number.repr(), VU32(100000));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 6);
+
+  number *= -1;
+
+  Bignum number2 = "-9961592990497139382044582140";
+  number2 *= number;
+
+  EXPECT_TRUE(number2 == "996159299049713938204458214000000");
+  EXPECT_EQ(number2.repr(), VU32(214000000, 938204458, 299049713, 996159));
+  EXPECT_EQ(number2.sign, POSITIVE);
+  EXPECT_EQ(number2.size, 33);
+}
+
+TEST(BignumMul, MultiplyNumbersWithDifferentSignOperator)
+{
+  Bignum number = "831775756193665995";
+  number *= -0x7fffffffffffffff;
+
+  EXPECT_TRUE(number == "-7671777250610394531850591919164582965");
+  EXPECT_EQ(number.repr(), VU32(164582965, 850591919, 610394531, 671777250, 7));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 37);
+
+  number *= -1;
+
+  EXPECT_TRUE(number == "7671777250610394531850591919164582965");
+  EXPECT_EQ(number.repr(), VU32(164582965, 850591919, 610394531, 671777250, 7));
+  EXPECT_EQ(number.sign, POSITIVE);
+  EXPECT_EQ(number.size, 37);
+
+  number *= "-2";
+
+  EXPECT_TRUE(number == "-15343554501220789063701183838329165930"); 
+  EXPECT_EQ(number.repr(), VU32(329165930, 701183838, 220789063, 343554501, 15));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 38);
+
+  number *= "9640694159795129495438938172";
+
+  EXPECT_TRUE(number == "-147922516270417532244590616608035660356984223407924252977598879960");
+  EXPECT_EQ(number.repr(), VU32(
+    598879960, 924252977, 984223407,  35660356, 590616608,
+    417532244, 922516270,       147));
+  EXPECT_EQ(number.sign, NEGATIVE);
+  EXPECT_EQ(number.size, 66);
+}
