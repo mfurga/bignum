@@ -46,44 +46,19 @@ class Bignum
   Bignum& operator=(const std::string& number);
 
   // Addition
-  void add(int number);
-  void add(int64_t number);
-  void add(const char *number);
-  void add(const std::string& number);
   void add(const Bignum& other);
-
-  Bignum operator+(const int number) const;
-  Bignum operator+(const int64_t number) const;
-  Bignum operator+(const char *number) const;
-  Bignum operator+(const std::string& number) const;
   Bignum operator+(const Bignum& number) const;
-
-  Bignum& operator+=(int number);
-  Bignum& operator+=(int64_t number);
-  Bignum& operator+=(const char *number);
-  Bignum& operator+=(const std::string& number);
   Bignum& operator+=(const Bignum& number);
 
   // Subtraction
-  void sub(int number, bool reverse=false);
-  void sub(int64_t number, bool reverse=false);
-  void sub(const char *number, bool reverse=false);
-  void sub(const std::string& number, bool reverse=false);
   void sub(const Bignum& other, bool reverse=false);
-
-  Bignum operator-(const int number) const;
-  Bignum operator-(const int64_t number) const;
-  Bignum operator-(const char *number) const;
-  Bignum operator-(const std::string& number) const;
   Bignum operator-(const Bignum& number) const;
-
-  Bignum& operator-=(int number);
-  Bignum& operator-=(int64_t number);
-  Bignum& operator-=(const char *number);
-  Bignum& operator-=(const std::string& number);
   Bignum& operator-=(const Bignum& number);
 
+  // Multiplication
   void mul(const Bignum& other);
+  Bignum operator*(const Bignum& number) const;
+  Bignum& operator*=(const Bignum& number);
 
   // Input / Output
   friend std::ostream& operator<<(std::ostream& os, const Bignum& number);

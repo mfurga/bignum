@@ -133,26 +133,6 @@ void Bignum::translate_string_to_number(const char *number, int length,
   this->normalizate();
 }
 
-void Bignum::add(int number)
-{
-  this->add(Bignum(number));
-}
-
-void Bignum::add(int64_t number)
-{
-  this->add(Bignum(number));
-}
-
-void Bignum::add(const char *number)
-{
-  this->add(Bignum(number));
-}
-
-void Bignum::add(const std::string& number)
-{
-  this->add(Bignum(number));
-}
-
 void Bignum::add(const Bignum& other)
 {
   // Performs an addition for the following scenarios:
@@ -200,26 +180,6 @@ void Bignum::add(const Bignum& other)
     this->number.push_back(carry);
 
   this->normalizate();
-}
-
-void Bignum::sub(int number, bool reverse)
-{
-  this->sub(Bignum(number), reverse);
-}
-
-void Bignum::sub(int64_t number, bool reverse)
-{
-  this->sub(Bignum(number), reverse);
-}
-
-void Bignum::sub(const char *number, bool reverse)
-{
-  this->sub(Bignum(number), reverse);
-}
-
-void Bignum::sub(const std::string& number, bool reverse)
-{
-  this->sub(Bignum(number), reverse);
 }
 
 void Bignum::sub(const Bignum& other, bool reverse)
@@ -461,34 +421,6 @@ Bignum& Bignum::operator=(const std::string& number)
   return *this;
 }
 
-Bignum Bignum::operator+(int number) const
-{
-  Bignum other = *this;
-  other.add(number);
-  return other;
-}
-
-Bignum Bignum::operator+(int64_t number) const
-{
-  Bignum other = *this;
-  other.add(number);
-  return other;
-}
-
-Bignum Bignum::operator+(const char *number) const
-{
-  Bignum other = *this;
-  other.add(number);
-  return other;
-}
-
-Bignum Bignum::operator+(const std::string& number) const
-{
-  Bignum other = *this;
-  other.add(number);
-  return other;
-}
-
 Bignum Bignum::operator+(const Bignum& number) const
 {
   Bignum other = *this;
@@ -496,62 +428,10 @@ Bignum Bignum::operator+(const Bignum& number) const
   return other;
 }
 
-Bignum& Bignum::operator+=(int number)
-{
-  this->add(number);
-  return *this;
-}
-
-Bignum& Bignum::operator+=(int64_t number)
-{
-  this->add(number);
-  return *this;
-}
-
-Bignum& Bignum::operator+=(const char *number)
-{
-  this->add(number);
-  return *this;
-}
-
-Bignum& Bignum::operator+=(const std::string& number)
-{
-  this->add(number);
-  return *this;
-}
-
 Bignum& Bignum::operator+=(const Bignum& number)
 {
   this->add(number);
   return *this;
-}
-
-Bignum Bignum::operator-(int number) const
-{
-  Bignum other = *this;
-  other.sub(number);
-  return other;
-}
-
-Bignum Bignum::operator-(int64_t number) const
-{
-  Bignum other = *this;
-  other.sub(number);
-  return other;
-}
-
-Bignum Bignum::operator-(const char *number) const
-{
-  Bignum other = *this;
-  other.sub(number);
-  return other;
-}
-
-Bignum Bignum::operator-(const std::string& number) const
-{
-  Bignum other = *this;
-  other.sub(number);
-  return other;
 }
 
 Bignum Bignum::operator-(const Bignum& number) const
@@ -561,33 +441,22 @@ Bignum Bignum::operator-(const Bignum& number) const
   return other;
 }
 
-Bignum& Bignum::operator-=(int number)
-{
-  this->sub(number);
-  return *this;
-}
-
-Bignum& Bignum::operator-=(int64_t number)
-{
-  this->sub(number);
-  return *this;
-}
-
-Bignum& Bignum::operator-=(const char *number)
-{
-  this->sub(number);
-  return *this;
-}
-
-Bignum& Bignum::operator-=(const std::string& number)
-{
-  this->sub(number);
-  return *this;
-}
-
 Bignum& Bignum::operator-=(const Bignum& number)
 {
   this->sub(number);
+  return *this;
+}
+
+Bignum Bignum::operator*(const Bignum& number) const
+{
+  Bignum other = *this;
+  other.mul(number);
+  return other;
+}
+
+Bignum& Bignum::operator*=(const Bignum& number)
+{
+  this->mul(number);
   return *this;
 }
 
