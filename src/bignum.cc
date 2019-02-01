@@ -265,7 +265,7 @@ void Bignum::mul(const Bignum& other)
         carry = number[j + i] + n % 1000000000;
         number[j + i] = carry % 1000000000;
         carry /= 1000000000;
-      } else   
+      } else
         number.push_back(n % 1000000000);
       carry += n / 1000000000;
     }
@@ -301,6 +301,12 @@ std::istream& operator>>(std::istream& is, Bignum& number)
   is >> other;
   number = other;
   return is;
+}
+
+Bignum& abs(Bignum& number)
+{
+  number.sign = POSITIVE;
+  return number;
 }
 
 int Bignum::operator[](int index) const
