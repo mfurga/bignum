@@ -2,4 +2,4 @@ a.out
 main.c
 build
 .*.swp
-
+tests/random

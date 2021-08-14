@@ -12,6 +12,10 @@ OBJS = $(BUILD_DIR)/bignum.o
 build: clean
 	$(CC) $(CFLASG) bignum.c -c -o $(BUILD_DIR)/bignum.o
 
+tests: build
+	$(CC) $(CFLASG) -I. $(OBJS) $(TESTS_DIR)/unit.c -o $(TESTS_DIR)/unit
+	$(TESTS_DIR)/unit
+
 # Random tests based on Python arithmetic.
 testsrandom: build
 	$(CC) $(CFLASG) -I. $(OBJS) $(RANDOM_TESTS_DIR)/check_tests.c -o $(RANDOM_TESTS_DIR)/check_tests
