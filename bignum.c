@@ -4,9 +4,25 @@
 
 #include "bignum.h"
 
-#include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <assert.h>
+
+static void bignum_resize(bignum *a, int sz);
+static void bignum_lshift(bignum *a, int shift);
+static bignum *bignum_normalize(bignum *a);
+static int bignum_is_zero(const bignum *a);
+static int bignum_bit_length(word x);
+static void bignum_set_sign(bignum *a, int sign);
+
+/* Arithmetic. */
+static bignum *bignum_add_a(const bignum *a, const bignum *b);
+static bignum *bignum_sub_a(const bignum *a, const bignum *b);
+static bignum *bignum_mul_a(const bignum *a, const bignum *b);
+static bignum *bignum_div_a(const bignum *a, const bignum *b);
+static bignum *bignum_div_a1(const bignum *a, const bignum *b);
+static bignum *bignum_div_a2(const bignum *a, const bignum *b);
 
 /*
  * Create a new bignum object initialized to 0.
@@ -38,40 +54,8 @@ bignum_free(bignum *a)
   free(a);
 }
 
-static void
-bignum_resize(bignum *a, int sz)
-{
-  int size, i;
-  word *digit;
-
-  assert(a != NULL);
-  assert(a->digit != NULL);
-  assert(sz > 0);
-
-  size = a->size;
-  digit = a->digit;
-
-  a->size = sz;
-  a->digit = malloc(sizeof(word) * sz);
-  if (a->digit == NULL) {
-    /* todo: Error. */
-    return;
-  }
-
-  for (i = 0; i < MIN(sz, size); i++) {
-    a->digit[i] = digit[i];
-  }
-
-  /* a is not normalize. */
-  for (; i < sz; i++) {
-    a->digit[i] = 0;
-  }
-
-  free(digit);
-}
-
 void
-bignum_assign(bignum *a, bignum *b)
+bignum_assign(bignum *a, const bignum *b)
 {
   int size;
 
@@ -698,9 +682,42 @@ bignum_div_a2(const bignum *a, const bignum *b)
   return bignum_normalize(res);
 }
 
-static int bignum_is_zero(const bignum *a)
+static int
+bignum_is_zero(const bignum *a)
 {
   return a->size == 1 && a->digit[0] == 0;
+}
+
+static void
+bignum_resize(bignum *a, int sz)
+{
+  int size, i;
+  word *digit;
+
+  assert(a != NULL);
+  assert(a->digit != NULL);
+  assert(sz > 0);
+
+  size = a->size;
+  digit = a->digit;
+
+  a->size = sz;
+  a->digit = malloc(sizeof(word) * sz);
+  if (a->digit == NULL) {
+    /* todo: Error. */
+    return;
+  }
+
+  for (i = 0; i < MIN(sz, size); i++) {
+    a->digit[i] = digit[i];
+  }
+
+  /* a is not normalize. */
+  for (; i < sz; i++) {
+    a->digit[i] = 0;
+  }
+
+  free(digit);
 }
 
 /*

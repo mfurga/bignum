@@ -5,8 +5,6 @@
 #ifndef _BIGNUM_H_INCLUDED_
 #define _BIGNUM_H_INCLUDED_
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 
 #define BIGNUM_BITS_IN_DITGIT 16
@@ -57,7 +55,7 @@ bignum *bignum_new(void);
 
 void bignum_free(bignum *a);
 
-void bignum_assign(bignum *a, bignum *b);
+void bignum_assign(bignum *a, const bignum *b);
 
 void bignum_assign_int(bignum *a, int b);
 
@@ -75,26 +73,5 @@ void bignum_mul(bignum *a, bignum *b, bignum *c);
 
 void bignum_div(bignum *a, bignum *b, bignum *c);
 
-static void bignum_lshift(bignum *a, int shift);
-
-static bignum *bignum_normalize(bignum *a);
-
-static bignum *bignum_add_a(const bignum *a, const bignum *b);
-
-static bignum *bignum_sub_a(const bignum *a, const bignum *b);
-
-static bignum *bignum_mul_a(const bignum *a, const bignum *b);
-
-static bignum *bignum_div_a(const bignum *a, const bignum *b);
-
-static bignum *bignum_div_a1(const bignum *a, const bignum *b);
-
-static bignum *bignum_div_a2(const bignum *a, const bignum *b);
-
-static int bignum_is_zero(const bignum *a);
-
-static int bignum_bit_length(word x);
-
-static void bignum_set_sign(bignum *a, int sign);
-
 #endif  // _BIGNUM_H_INCLUDED_
+
