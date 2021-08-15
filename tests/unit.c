@@ -1,48 +1,57 @@
 #include "bignum.h"
+#include "unit.h"
 
 #include <stdio.h>
-#include <assert.h>
 #include <limits.h>
 
-void
-bignum_number_equal(bignum *a, int b)
-{
-  int sign;
-  unsigned abs_b;
-
-  if (b >= 0) {
-    sign = BIGNUM_POSITIVE;
-    abs_b = (unsigned)b;
-  } else {
-    sign = BIGNUM_NEGATIVE;
-    abs_b = 0U - (unsigned)b;
-  }
-
-  assert(a->sign == sign);
-
 #if BIGNUM_BITS_IN_DITGIT == 32
-  assert(a->size == 1);
-  assert(a->digit[0] == abs_b);
+
+#define BIGNUM_CMP_WITH_INT(a, b) do {                                                 \
+    int sign;                                                                          \
+    unsigned abs_b;                                                                    \
+    if ((b) >= 0) {                                                                    \
+      sign = BIGNUM_POSITIVE;                                                          \
+      abs_b = (unsigned)(b);                                                           \
+    } else {                                                                           \
+      sign = BIGNUM_NEGATIVE;                                                          \
+      abs_b = 0U - (unsigned)(b);                                                      \
+    }                                                                                  \
+    ASSERT_EQUAL_INT((a)->sign, sign);                                                 \
+    ASSERT_EQUAL_INT((a)->size, 1);                                                    \
+    ASSERT_EQUAL_UINT((a)->digit[0], abs_b);                                           \
+  } while (0)
+
 #elif BIGNUM_BITS_IN_DITGIT == 16
-  if (abs_b >= 1U << 16) {
-    assert(a->size == 2);
-    assert(a->digit[0] == (abs_b & 0xffff));
-    assert(a->digit[1] == ((abs_b >> 16) & 0xffff));
-  } else {
-    assert(a->size == 1);
-    assert(a->digit[0] == abs_b);
-  }
+
+#define BIGNUM_CMP_WITH_INT(a, b) do {                                                 \
+    int sign;                                                                          \
+    unsigned abs_b;                                                                    \
+    if ((b) >= 0) {                                                                    \
+      sign = BIGNUM_POSITIVE;                                                          \
+      abs_b = (unsigned)(b);                                                           \
+    } else {                                                                           \
+      sign = BIGNUM_NEGATIVE;                                                          \
+      abs_b = 0U - (unsigned)(b);                                                      \
+    }                                                                                  \
+    ASSERT_EQUAL_INT(a->sign, sign);                                                   \
+    if (abs_b >= 1U << 16) {                                                           \
+      ASSERT_EQUAL_INT((a)->size, 2);                                                  \
+      ASSERT_EQUAL_UINT((a)->digit[0], (abs_b & 0xffff));                              \
+      ASSERT_EQUAL_UINT((a)->digit[1], ((abs_b >> 16) & 0xffff));                      \
+    } else {                                                                           \
+      ASSERT_EQUAL_INT((a)->size, 1);                                                  \
+      ASSERT_EQUAL_UINT((a)->digit[0], abs_b);                                         \
+    }
+  } while (0)
+
 #endif
-}
 
 void
 bignum_new_tests()
 {
   bignum *a = bignum_new();
 
-  assert(a->size == 1);
-  assert(a->sign == BIGNUM_POSITIVE);
-  assert(a->digit[0] == 0);
+  BIGNUM_CMP_WITH_INT(a, 0);
 
   bignum_free(a);
 }
@@ -53,22 +62,22 @@ bignum_assign_int_tests()
   bignum *a = bignum_new();
 
   bignum_assign_int(a, -1);
-  bignum_number_equal(a, -1);
+  BIGNUM_CMP_WITH_INT(a, -1);
 
   bignum_assign_int(a, 0xffff);
-  bignum_number_equal(a, 0xffff);
+  BIGNUM_CMP_WITH_INT(a, 0xffff);
 
   bignum_assign_int(a, 0xffff + 1);
-  bignum_number_equal(a, 0xffff + 1);
+  BIGNUM_CMP_WITH_INT(a, 0xffff + 1);
 
   bignum_assign_int(a, -0xffff - 1);
-  bignum_number_equal(a, -0xffff - 1);
+  BIGNUM_CMP_WITH_INT(a, -0xffff - 1);
 
   bignum_assign_int(a, INT_MAX);
-  bignum_number_equal(a, INT_MAX);
+  BIGNUM_CMP_WITH_INT(a, INT_MAX);
 
   bignum_assign_int(a, INT_MIN);
-  bignum_number_equal(a, INT_MIN);
+  BIGNUM_CMP_WITH_INT(a, INT_MIN);
 
   bignum_free(a);
 }
@@ -80,32 +89,51 @@ bignum_assign_str_tests()
   bignum *a = bignum_new();
 
   bignum_assign_str(a, "0");
-  bignum_number_equal(a, 0);
+  BIGNUM_CMP_WITH_INT(a, 0);
 
   bignum_assign_str(a, "+0");
-  bignum_number_equal(a, 0);
+  BIGNUM_CMP_WITH_INT(a, 0);
 
   bignum_assign_str(a, "-0");
-  bignum_number_equal(a, 0);
+  BIGNUM_CMP_WITH_INT(a, 0);
 
   bignum_assign_str(a, "+1");
-  bignum_number_equal(a, 1);
+  BIGNUM_CMP_WITH_INT(a, 1);
 
   bignum_assign_str(a, "32767"); /* 2^15 - 1 */
-  bignum_number_equal(a, 32767);
+  BIGNUM_CMP_WITH_INT(a, 32767);
 
   bignum_assign_str(a, "-32768"); /* -2^15 */
-  bignum_number_equal(a, -32768);
+  BIGNUM_CMP_WITH_INT(a, -32768);
 
   bignum_assign_str(a, "2147483647"); /* INT_MAX: 2^31 - 1 */
-  bignum_number_equal(a, 2147483647);
+  BIGNUM_CMP_WITH_INT(a, 2147483647);
 
   bignum_assign_str(a, "-2147483648"); /* INT_MIN: -2^31 */
-  bignum_number_equal(a, -2147483648);
+  BIGNUM_CMP_WITH_INT(a, -2147483648);
 
   bignum_free(a);
 }
 
+void
+bignum_neg_tests()
+{
+  bignum *a = bignum_new();
+
+  bignum_assign_int(a, -1);
+  bignum_neg(a);
+  BIGNUM_CMP_WITH_INT(a, 0);
+
+  bignum_assign_int(a, 0);
+  bignum_neg(a);
+  BIGNUM_CMP_WITH_INT(a, -1);
+
+  bignum_assign_int(a, 0);
+  bignum_neg(a);
+  BIGNUM_CMP_WITH_INT(a, -1);
+
+  bignum_free(a);
+}
 
 int main(void)
 {
@@ -113,7 +141,10 @@ int main(void)
   bignum_assign_int_tests();
   bignum_assign_str_tests();
 
-  printf("OK\n");
+  bignum_neg_tests();
+
+  UNIT_STATUS_AND_EXIT;
+
   return 0;
 }
 
