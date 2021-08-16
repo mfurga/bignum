@@ -24,6 +24,8 @@ static bignum *bignum_div_a(const bignum *a, const bignum *b);
 static bignum *bignum_div_a1(const bignum *a, const bignum *b);
 static bignum *bignum_div_a2(const bignum *a, const bignum *b);
 
+static bignum *bignum_bitwise_op(bignum *a, bignum *b, char op);
+
 /*
  * Create a new bignum object initialized to 0.
  */
@@ -52,6 +54,38 @@ bignum_free(bignum *a)
   assert(a->digit != NULL);
   free(a->digit);
   free(a);
+}
+
+static void
+bignum_resize(bignum *a, int sz)
+{
+  int size, i;
+  word *digit;
+
+  assert(a != NULL);
+  assert(a->digit != NULL);
+  assert(sz > 0);
+
+  size = a->size;
+  digit = a->digit;
+
+  a->size = sz;
+  a->digit = malloc(sizeof(word) * sz);
+  if (a->digit == NULL) {
+    /* todo: Error. */
+    return;
+  }
+
+  for (i = 0; i < MIN(sz, size); i++) {
+    a->digit[i] = digit[i];
+  }
+
+  /* a is not normalize. */
+  for (; i < sz; i++) {
+    a->digit[i] = a->sign == BIGNUM_NEGATIVE_COMPLEMENT ? BIGNUM_MASK : 0;
+  }
+
+  free(digit);
 }
 
 void
@@ -207,12 +241,12 @@ bignum_to_int(bignum *a)
   }
 #endif
 
-  return b * a->sign;
+  return a->sign == BIGNUM_POSITIVE ? (b) : -(b);
 }
 
 /*
  * Return the decimal representation of the number. Caller should free the memory
- * allocated by this function.
+ * allocated by this function. Return NULL on error.
  */
 char *
 bignum_to_str(bignum *a)
@@ -236,6 +270,9 @@ bignum_to_str(bignum *a)
   digits = (31LL * (long long)size_a * BIGNUM_BITS_IN_DITGIT) / 100 + 1;
 
   b = bignum_new();
+  if (b == NULL) {
+    return NULL;
+  }
   bignum_resize(b, digits / BIGNUM_DECIMAL_DIGITS + 1);
 
   /* Radix conversion according to TAOCP vol. 2 (3rd ed.), section 4.4, Method 1b. */
@@ -276,6 +313,10 @@ bignum_to_str(bignum *a)
 
   size_r++;  /* +1 for the null byte. */
   r = malloc(size_r * sizeof(char));
+  if (r == NULL) {
+    bignum_free(b);
+    return NULL;
+  }
 
   p = r + (size_r - 1);
   *p-- = '\0';
@@ -682,42 +723,191 @@ bignum_div_a2(const bignum *a, const bignum *b)
   return bignum_normalize(res);
 }
 
+/*
+ * Convert the bignum object to the two's complement representation.
+ * After that bignum->sign is treated as sign bit in the two's complement.
+ */
+static void
+bignum_to_complement(bignum *a)
+{
+  dword carry = 1;
+
+  /* Positive number already have a good two's complement representation. */
+  if (a->sign == BIGNUM_POSITIVE) {
+    a->sign = BIGNUM_POSITIVE_COMPLEMENT;
+    return;
+  }
+
+  a->sign = BIGNUM_NEGATIVE_COMPLEMENT;
+
+  for (int i = 0; i < a->size; i++) {
+    carry += ~(a->digit[i]) & BIGNUM_MASK;
+    a->digit[i] = carry & BIGNUM_MASK;
+    carry >>= BIGNUM_SHIFT;
+  }
+
+  a->sign = (a->sign + carry) & 1;
+}
+
+/*
+ * Convert the two's complement representation to the correct bignum object.
+ */
+static void
+bignum_from_complement(bignum *a)
+{
+  dword borrow = 1;
+
+  /* Positive number already have a good bignum representation. */
+  if (a->sign == BIGNUM_POSITIVE_COMPLEMENT) {
+    a->sign = BIGNUM_POSITIVE;
+    return;
+  }
+
+  a->sign = BIGNUM_NEGATIVE;
+
+  for (int i = 0; i < a->size; i++) {
+    borrow = BIGNUM_BASE + (dword)a->digit[i] - borrow;
+    a->digit[i] = ~(borrow & BIGNUM_MASK);
+    borrow = borrow < BIGNUM_BASE;
+  }
+
+  assert(borrow == 0);  /* overflow. */
+}
+
+void
+bignum_neg(bignum *a, bignum *b)
+{
+  assert(a != NULL && b != NULL);
+
+  bignum_assign(b, a);
+  /* +1 to make sure that the final two's complement representation doesn't overflow. */
+  bignum_resize(b, a->size + 1);
+
+  bignum_to_complement(b);
+
+  b->sign = 1 - b->sign;
+  for (int i = 0; i < b->size; i++) {
+    b->digit[i] = ~b->digit[i];
+  }
+
+  bignum_from_complement(b);
+  bignum_normalize(b);
+}
+
+void
+bignum_or(bignum *a, bignum *b, bignum *c)
+{
+  assert(a != NULL && b != NULL && c != NULL);
+
+  bignum *r = bignum_bitwise_op(a, b, '|');
+
+  bignum_assign(c, r);
+  bignum_free(r);
+}
+
+void
+bignum_xor(bignum *a, bignum *b, bignum *c)
+{
+  assert(a != NULL && b != NULL && c != NULL);
+
+  bignum *r = bignum_bitwise_op(a, b, '^');
+
+  bignum_assign(c, r);
+  bignum_free(r);
+}
+
+void
+bignum_and(bignum *a, bignum *b, bignum *c)
+{
+  assert(a != NULL && b != NULL && c != NULL);
+
+  bignum *r = bignum_bitwise_op(a, b, '&');
+
+  bignum_assign(c, r);
+  bignum_free(r);
+}
+
+/* Perform bitwise OR XOR AND. */
+static bignum *
+bignum_bitwise_op(bignum *a, bignum *b, char op)
+{
+  bignum *r;
+  int size_a, size_b, i;
+  word pad;
+
+  size_a = a->size;
+  size_b = b->size;
+
+  if (size_a < size_b) {
+    { bignum *tmp = a; a = b; b = tmp; }
+    { int tmp = size_a; size_a = size_b; size_b = tmp; }
+  }
+
+  bignum_to_complement(a);
+  bignum_to_complement(b);
+
+  if (b->sign == BIGNUM_POSITIVE_COMPLEMENT) {
+    pad = 0;
+  } else {
+    pad = BIGNUM_MASK;  /* 1111... */
+  }
+
+  r = bignum_new();
+
+  switch (op) {
+    case '|':
+      r->sign = a->sign | b->sign;
+    break;
+    case '^':
+      r->sign = a->sign ^ b->sign;
+    break;
+    case '&':
+      r->sign = a->sign & b->sign;
+    break;
+  }
+
+  /* +1 if result is negative to make sure that the final two's complement
+     representation doesn't overflow. */
+  bignum_resize(r, size_a + r->sign);
+
+  switch (op) {
+    case '|':
+      for (i = 0; i < size_b; i++) {
+        r->digit[i] = a->digit[i] | b->digit[i];
+      }
+      for (; i < size_a; i++) {
+        r->digit[i] = a->digit[i] | pad;
+      }
+    break;
+    case '^':
+      for (i = 0; i < size_b; i++) {
+        r->digit[i] = a->digit[i] ^ b->digit[i];
+      }
+      for (; i < size_a; i++) {
+        r->digit[i] = a->digit[i] ^ pad;
+      }
+    break;
+    case '&':
+      for (i = 0; i < size_b; i++) {
+        r->digit[i] = a->digit[i] & b->digit[i];
+      }
+      for (; i < size_a; i++) {
+        r->digit[i] = a->digit[i] & pad;
+      }
+    break;
+  }
+
+  bignum_from_complement(a);
+  bignum_from_complement(b);
+  bignum_from_complement(r);
+
+  return bignum_normalize(r);
+}
+
 static int
 bignum_is_zero(const bignum *a)
 {
   return a->size == 1 && a->digit[0] == 0;
-}
-
-static void
-bignum_resize(bignum *a, int sz)
-{
-  int size, i;
-  word *digit;
-
-  assert(a != NULL);
-  assert(a->digit != NULL);
-  assert(sz > 0);
-
-  size = a->size;
-  digit = a->digit;
-
-  a->size = sz;
-  a->digit = malloc(sizeof(word) * sz);
-  if (a->digit == NULL) {
-    /* todo: Error. */
-    return;
-  }
-
-  for (i = 0; i < MIN(sz, size); i++) {
-    a->digit[i] = digit[i];
-  }
-
-  /* a is not normalize. */
-  for (; i < sz; i++) {
-    a->digit[i] = 0;
-  }
-
-  free(digit);
 }
 
 /*
@@ -769,3 +959,4 @@ bignum_normalize(bignum *a)
   }
   return a;
 }
+

@@ -41,9 +41,11 @@ typedef int32_t sdword;
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-#define BIGNUM_POSITIVE 1
-#define BIGNUM_NEGATIVE -1
-#define BIGNUM_NOT_SET 0
+#define BIGNUM_POSITIVE 10
+#define BIGNUM_NEGATIVE 11
+
+#define BIGNUM_POSITIVE_COMPLEMENT 0
+#define BIGNUM_NEGATIVE_COMPLEMENT 1
 
 typedef struct bignum {
   int sign;
@@ -72,6 +74,16 @@ void bignum_sub(bignum *a, bignum *b, bignum *c);
 void bignum_mul(bignum *a, bignum *b, bignum *c);
 
 void bignum_div(bignum *a, bignum *b, bignum *c);
+
+/* Bitwise */
+
+void bignum_neg(bignum *a, bignum *b);
+
+void bignum_or(bignum *a, bignum *b, bignum *c);
+
+void bignum_xor(bignum *a, bignum *b, bignum *c);
+
+void bignum_and(bignum *a, bignum *b, bignum *c);
 
 #endif  // _BIGNUM_H_INCLUDED_
 
