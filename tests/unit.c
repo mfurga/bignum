@@ -41,7 +41,7 @@
     } else {                                                                           \
       ASSERT_EQUAL_INT((a)->size, 1);                                                  \
       ASSERT_EQUAL_UINT((a)->digit[0], abs_b);                                         \
-    }
+    }                                                                                  \
   } while (0)
 
 #endif
@@ -119,20 +119,40 @@ void
 bignum_neg_tests()
 {
   bignum *a = bignum_new();
+  bignum *b = bignum_new();
 
   bignum_assign_int(a, -1);
-  bignum_neg(a);
+  bignum_neg(a, b);
+  BIGNUM_CMP_WITH_INT(a, -1);
+  BIGNUM_CMP_WITH_INT(b, 0);
+
+  bignum_assign_int(a, 0);
+  bignum_neg(a, b);
   BIGNUM_CMP_WITH_INT(a, 0);
+  BIGNUM_CMP_WITH_INT(b, -1);
 
-  bignum_assign_int(a, 0);
-  bignum_neg(a);
-  BIGNUM_CMP_WITH_INT(a, -1);
+  bignum_assign_int(a, INT_MAX);
+  bignum_neg(a, b);
+  BIGNUM_CMP_WITH_INT(a, INT_MAX);
+  BIGNUM_CMP_WITH_INT(b, INT_MIN);
 
-  bignum_assign_int(a, 0);
-  bignum_neg(a);
-  BIGNUM_CMP_WITH_INT(a, -1);
+  bignum_assign_int(a, INT_MIN);
+  bignum_neg(a, b);
+  BIGNUM_CMP_WITH_INT(a, INT_MIN);
+  BIGNUM_CMP_WITH_INT(b, INT_MAX);
+
+  bignum_assign_int(a, 65535);  /* 2^16 - 1 */
+  bignum_neg(a, b);
+  BIGNUM_CMP_WITH_INT(a, 65535);
+  BIGNUM_CMP_WITH_INT(b, -65536);
+
+  bignum_assign_int(a, -65535);  /* -2^16 + 1 */
+  bignum_neg(a, b);
+  BIGNUM_CMP_WITH_INT(a, -65535);
+  BIGNUM_CMP_WITH_INT(b, 65534);
 
   bignum_free(a);
+  bignum_free(b);
 }
 
 int main(void)
