@@ -311,7 +311,7 @@ bignum_to_str(bignum *a)
     size_r++;  /* +1 for the '-' character. */
   }
 
-  size_r++;  /* +1 for the null byte. */
+  size_r++;  /* +1 for the nul byte. */
   r = malloc(size_r * sizeof(char));
   if (r == NULL) {
     bignum_free(b);
